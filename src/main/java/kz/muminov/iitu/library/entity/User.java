@@ -1,5 +1,6 @@
 package kz.muminov.iitu.library.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import kz.muminov.iitu.library.enums.Status;
 
 import javax.persistence.*;
@@ -26,7 +27,8 @@ public class User {
     )
     private Set<Role> roles = new HashSet<>();
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<IssuedBooks> issuedBooks;
 
     public User(String name, Status status) {
@@ -67,6 +69,14 @@ public class User {
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
+    }
+
+    public List<IssuedBooks> getIssuedBooks() {
+        return issuedBooks;
+    }
+
+    public void setIssuedBooks(List<IssuedBooks> issuedBooks) {
+        this.issuedBooks = issuedBooks;
     }
 
     @Override

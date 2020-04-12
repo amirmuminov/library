@@ -4,6 +4,7 @@ import kz.muminov.iitu.library.entity.Author;
 import kz.muminov.iitu.library.repository.AuthorRepository;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -15,10 +16,8 @@ public class AuthorService {
         this.authorRepository = authorRepository;
     }
 
-    public void showAllAuthors(){
-        for(Author author: authorRepository.findAll()){
-            System.out.println("Author's ID: " + author.getId() + " " + "Author's name: " + author.getName());
-        }
+    public List<Author> showAllAuthors(){
+        return authorRepository.findAll();
     }
 
     public Optional<Author> getAuthorById(Long id){

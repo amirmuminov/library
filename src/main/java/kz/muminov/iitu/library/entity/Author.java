@@ -1,5 +1,7 @@
 package kz.muminov.iitu.library.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
@@ -13,6 +15,7 @@ public class Author {
     private String name;
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
+    @JsonManagedReference(value = "author")
     private Set<Book> books = new HashSet<>();
 
     public Author(String name) {
@@ -51,4 +54,11 @@ public class Author {
         this.books = books;
     }
 
+    @Override
+    public String toString() {
+        return "Author{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }

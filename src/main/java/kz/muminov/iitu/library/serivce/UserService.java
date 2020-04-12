@@ -11,6 +11,7 @@ import kz.muminov.iitu.library.repository.UserRepository;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -30,59 +31,49 @@ public class UserService {
         return userRepository.findById(id);
     }
 
-    public void issueBook(User user, Book book){
-        if (ifDataIsEmpty(user, book)){
-            if (book.getBookStatus() == BookStatus.RETURNED) {
-                IssuedBooks issuedBooks = new IssuedBooks(user, book);
-                issuedBooksRepository.save(issuedBooks);
-                book.setBookStatus(BookStatus.ISSUED);
-                bookRepository.save(book);
-            }
-            else{
-                System.out.println("The book is not available");
-            }
+    public IssuedBooks issueBook(IssuedBooks issuedBooks){
+        if (issuedBooks.getBook().getBookStatus() == BookStatus.RETURNED) {
+            Book book = issuedBooks.getBook();
+            book.setBookStatus(BookStatus.ISSUED);
+            bookRepository.save(book);
+            return issuedBooksRepository.save(issuedBooks);
+        }
+        else{
+            System.out.println("The book is not available");
+            return null;
         }
     }
 
-    public void returnBook(User user, Book book){
-        if (ifDataIsEmpty(user, book)) {
-            if (book.getBookStatus() == BookStatus.ISSUED || book.getBookStatus() == BookStatus.OVER_DUE_DATE) {
-                IssuedBooks issuedBooks = issuedBooksRepository.findByUserAndBookAndActualReturnDate(user, book, null);
-                if (issuedBooks != null) {
-                    issuedBooks.setActualReturnDate(LocalDate.now());
-                    if (issuedBooks.getActualReturnDate().isAfter(issuedBooks.getExpectedReturnDate())) {
-                        user.setStatus(Status.UNSCRUPULOUS);
-                        userRepository.save(user);
-                    }
-                    issuedBooksRepository.save(issuedBooks);
-                    book.setBookStatus(BookStatus.RETURNED);
-                    bookRepository.save(book);
-                } else {
-                    System.out.println("It's not possible to return the book. Please check user id and book id");
+    public IssuedBooks returnBook(IssuedBooks issuedBooks){
+        if (issuedBooks.getBook().getBookStatus() == BookStatus.ISSUED || issuedBooks.getBook().getBookStatus() == BookStatus.OVER_DUE_DATE) {
+            issuedBooks = issuedBooksRepository.findByUserAndBookAndActualReturnDate(issuedBooks.getUser(), issuedBooks.getBook(), null);
+            if (issuedBooks != null) {
+                issuedBooks.setActualReturnDate(LocalDate.now());
+                if (issuedBooks.getActualReturnDate().isAfter(issuedBooks.getExpectedReturnDate())) {
+                    issuedBooks.getUser().setStatus(Status.UNSCRUPULOUS);
+                    userRepository.save(issuedBooks.getUser());
                 }
-            }else{
+                issuedBooks.getBook().setBookStatus(BookStatus.RETURNED);
+                bookRepository.save(issuedBooks.getBook());
+                return issuedBooksRepository.save(issuedBooks);
+            } else {
                 System.out.println("It's not possible to return the book. Please check user id and book id");
             }
+        }else{
+            System.out.println("It's not possible to return the book. Please check user id and book id");
         }
+        return issuedBooks;
     }
 
-    private boolean ifDataIsEmpty(User user, Book book){
-        boolean isEmpty = false;
-        if (user == null){
-            isEmpty = true;
-            System.out.println("Invalid ID for the user");
-        }
-        if (book == null){
-            isEmpty = true;
-            System.out.println("Invalid ID for the book");
-        }
-        return !isEmpty;
+    public boolean ifDataIsEmpty(Optional<User> user, Optional<Book> book){
+        return user.isPresent() && book.isPresent();
     }
 
-    public void showAllUsers(){
-        for (User user: userRepository.findAll()){
-            System.out.println(user.toString());
-        }
+    public List<User> showAllUsers(){
+        return userRepository.findAll();
     }
 
+    public User saveUser(User user) {
+        return userRepository.save(user);
+    }
 }

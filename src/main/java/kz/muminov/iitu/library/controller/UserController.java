@@ -1,85 +1,57 @@
 package kz.muminov.iitu.library.controller;
 
-import kz.muminov.iitu.library.entity.Book;
+import kz.muminov.iitu.library.entity.IssuedBooks;
 import kz.muminov.iitu.library.entity.User;
-import kz.muminov.iitu.library.enums.BookStatus;
+import kz.muminov.iitu.library.serivce.BookService;
 import kz.muminov.iitu.library.serivce.UserService;
-import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.Scanner;
+import java.util.List;
 
-@Component
+@RestController
+@RequestMapping("/users")
 public class UserController {
 
-    private Scanner in = new Scanner(System.in);
-    //Services
     private final UserService userService;
-
-    //Controllers
-    private final BookController bookController;
+    private final BookService bookService;
 
 
-    public UserController(UserService userService, BookController bookController) {
+    public UserController(UserService userService, BookService bookService) {
         this.userService = userService;
-        this.bookController = bookController;
+        this.bookService = bookService;
     }
 
-    public void showMenu(){
-        System.out.println("1. Issue book");
-        System.out.println("2. Show all users");
-        System.out.println("3. Return book");
+    @GetMapping("/all")
+    public List<User> showAllUsers(){
+        return userService.showAllUsers();
     }
 
-    public void choice(int choice){
-        switch (choice){
-            case 1:
-                issueBook();
-                break;
-            case 2:
-                shooAllUsers();
-                break;
-            case 3:
-                returnBook();
-                break;
-            default:
-                System.out.println("There is no such option");
-                break;
-        }
-    }
-
-    public void shooAllUsers(){
-        userService.showAllUsers();
-    }
-
-    public User findUserById(){
-        System.out.println("Enter user ID: ");
-        Long id = in.nextLong();
+    @GetMapping("/{id}")
+    public User findUserById(@PathVariable Long id){
         return userService.findUserById(id).orElse(null);
     }
 
-    public void issueBook(){
-        User user = findUserById();
-        Book book = bookController.findBookById();
-        userService.issueBook(user, book);
+    @PutMapping("/{id}")
+    public User editUser(@RequestBody User user, @PathVariable Long id){
+        user.setId(id);
+        return userService.saveUser(user);
     }
 
-    public void returnBook(){
-        User user = findUserById();
-        Book book = bookController.findBookById();
-        userService.returnBook(user, book);
+    @PostMapping("/issue")
+    public IssuedBooks issueBook(@RequestBody IssuedBooks issuedBooks){
+//        Optional<User> user = userService.findUserById(issuedBooks.getUser().getId());
+//        Optional<Book> book = bookService.findBookById(issuedBooks.getBook().getId());
+//        if(userService.ifDataIsEmpty(user, book)){
+//            issuedBooks.setUser(user.get());
+//            issuedBooks.setBook(book.get());
+//        }
+        return userService.issueBook(issuedBooks);
     }
 
-//    private boolean ifDataIsEmpty(User user, Book book){
-//        boolean isEmpty = false;
-//        if (user == null){
-//            isEmpty = true;
-//            System.out.println("Invalid ID for the user");
-//        }
-//        if (book == null){
-//            isEmpty = true;
-//            System.out.println("Invalid ID for the book");
-//        }
-//        return !isEmpty;
-//    }
+    @PutMapping("/return")
+    public IssuedBooks returnBook(@RequestBody IssuedBooks issuedBooks){
+        return userService.returnBook(issuedBooks);
+    }
+
 
 }

@@ -9,6 +9,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -22,20 +23,20 @@ public class BookService {
         this.bookRepository = bookRepository;
     }
 
-    public void showAllBooks(){
-        for (Book book: bookRepository.findAll()){
-            System.out.println(book.toString());
-        }
+    public List<Book> showAllBooks(){
+        return bookRepository.findAll();
     }
 
-    public void addBook(Book book){
-        bookRepository.save(book);
+    public Book addBook(Book book){
+        return bookRepository.save(book);
     }
 
-    public void findBook(String search){
-        for (Book book: bookRepository.findAllByTitleIsContainingOrDescriptionIsContainingOrAuthorNameIsContainingIgnoreCase(search)){
-            System.out.println(book.toString());
-        }
+    public List<Book> findBook(String search){
+        return bookRepository.findAllByTitleIsContainingOrDescriptionIsContainingOrAuthorNameIsContainingIgnoreCase(search);
+    }
+
+    public void deleteBook(Long id){
+        bookRepository.deleteById(id);
     }
 
     public Optional<Book> findBookById(Long id){

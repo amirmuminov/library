@@ -1,5 +1,8 @@
 package kz.muminov.iitu.library.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import kz.muminov.iitu.library.enums.BookStatus;
 import kz.muminov.iitu.library.enums.Genre;
 
@@ -23,9 +26,11 @@ public class Book {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id")
+    @JsonBackReference(value = "author")
     private Author author;
 
-    @OneToMany(mappedBy = "book")
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<IssuedBooks> issuedBooks;
 
     public Book(String title, String description, Genre genre, Author author) {
@@ -44,14 +49,6 @@ public class Book {
     }
 
     public Book() {
-    }
-
-    public BookStatus getBookStatus() {
-        return bookStatus;
-    }
-
-    public void setBookStatus(BookStatus bookStatus) {
-        this.bookStatus = bookStatus;
     }
 
     public Long getId() {
@@ -78,6 +75,14 @@ public class Book {
         this.description = description;
     }
 
+    public BookStatus getBookStatus() {
+        return bookStatus;
+    }
+
+    public void setBookStatus(BookStatus bookStatus) {
+        this.bookStatus = bookStatus;
+    }
+
     public Genre getGenre() {
         return genre;
     }
@@ -94,6 +99,14 @@ public class Book {
         this.author = author;
     }
 
+    public List<IssuedBooks> getIssuedBooks() {
+        return issuedBooks;
+    }
+
+    public void setIssuedBooks(List<IssuedBooks> issuedBooks) {
+        this.issuedBooks = issuedBooks;
+    }
+
     @Override
     public String toString() {
         return "Book{" +
@@ -105,15 +118,4 @@ public class Book {
                 ", author=" + author +
                 '}';
     }
-
-    //    @Override
-//    public String toString() {
-//        return  "ID: " + id + '\n' +
-//                "Title: " + title + '\n' +
-//                "Description: " + description + '\n' +
-//                "Genre: " + " " + genre + '\n' +
-//                "Author: " + author.getName() + '\n' +
-//                "Availability: " + bookStatus + '\n' +
-//                "- - - - - - - - - - - - - - - - - - - - ";
-//    }
 }
