@@ -1,11 +1,13 @@
 package kz.muminov.iitu.library.entity;
 
+import org.springframework.security.core.GrantedAuthority;
+
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-public class Role {
+public class Role implements GrantedAuthority {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,6 +38,11 @@ public class Role {
 
     public void setName(kz.muminov.iitu.library.enums.Role name) {
         this.name = name;
+    }
+
+    @Override
+    public String getAuthority() {
+        return name.toString();
     }
 
 }

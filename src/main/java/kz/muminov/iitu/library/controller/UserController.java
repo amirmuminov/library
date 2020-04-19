@@ -1,5 +1,6 @@
 package kz.muminov.iitu.library.controller;
 
+import kz.muminov.iitu.library.entity.Book;
 import kz.muminov.iitu.library.entity.IssuedBooks;
 import kz.muminov.iitu.library.entity.User;
 import kz.muminov.iitu.library.serivce.BookService;
@@ -7,6 +8,7 @@ import kz.muminov.iitu.library.serivce.UserService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
@@ -21,37 +23,44 @@ public class UserController {
         this.bookService = bookService;
     }
 
-    @GetMapping("/all")
+    @GetMapping("/api/all")
     public List<User> showAllUsers(){
         return userService.showAllUsers();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/api/{id}")
     public User findUserById(@PathVariable Long id){
         return userService.findUserById(id).orElse(null);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/api/{id}")
     public User editUser(@RequestBody User user, @PathVariable Long id){
         user.setId(id);
         return userService.saveUser(user);
     }
 
-    @PostMapping("/issue")
-    public IssuedBooks issueBook(@RequestBody IssuedBooks issuedBooks){
-//        Optional<User> user = userService.findUserById(issuedBooks.getUser().getId());
-//        Optional<Book> book = bookService.findBookById(issuedBooks.getBook().getId());
-//        if(userService.ifDataIsEmpty(user, book)){
-//            issuedBooks.setUser(user.get());
-//            issuedBooks.setBook(book.get());
-//        }
-        return userService.issueBook(issuedBooks);
+    @PostMapping("/issue/{userId}/{bookId}")
+    public IssuedBooks issueBook(@PathVariable Long userId, @PathVariable Long bookId){
+        Optional<User> optUser = userService.findUserById(userId);
+        Optional<Book> optBook = bookService.findBookById(bookId);
+        if(optBook.isPresent() && optUser.isPresent())
+            return userService.issueBook(optBook.get(), optUser.get());
+        return null;
+
     }
 
-    @PutMapping("/return")
-    public IssuedBooks returnBook(@RequestBody IssuedBooks issuedBooks){
-        return userService.returnBook(issuedBooks);
+    @PutMapping("/return/{userId}/{bookId}")
+    public IssuedBooks returnBook(@PathVariable Long userId, @PathVariable Long bookId){
+        Optional<User> optUser = userService.findUserById(userId);
+        Optional<Book> optBook = bookService.findBookById(bookId);
+        if(optBook.isPresent() && optUser.isPresent())
+            return userService.returnBook(optBook.get(), optUser.get());
+        return null;
     }
 
+    @PostMapping("/register")
+    public User createUser(@RequestBody User user){
+        return userService.saveUser(user);
+    }
 
 }

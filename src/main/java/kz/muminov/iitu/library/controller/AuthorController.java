@@ -19,12 +19,12 @@ public class AuthorController {
         this.authorService = authorService;
     }
 
-    @GetMapping("/all")
+    @GetMapping("api/all")
     public List<Author> showAllAuthors() {
         return authorService.showAllAuthors();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("api/{id}")
     public Author getAuthorById(@PathVariable Long id){
         return authorService.getAuthorById(id).orElse(null);
     }
