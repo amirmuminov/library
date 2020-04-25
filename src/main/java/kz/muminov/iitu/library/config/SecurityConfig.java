@@ -3,7 +3,6 @@ package kz.muminov.iitu.library.config;
 import kz.muminov.iitu.library.config.jwt.JwtTokenAuthenticationFilter;
 import kz.muminov.iitu.library.config.jwt.JwtTokenGeneratorFilter;
 import kz.muminov.iitu.library.serivce.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -34,7 +33,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/books").permitAll()
                 .antMatchers(HttpMethod.POST, "/books").hasAuthority("ADMIN")
                 .antMatchers(HttpMethod.DELETE, "/books/**").hasAuthority("ADMIN")
-                .antMatchers("/books/**").permitAll()
+                .antMatchers("/books/**", "/swagger-ui.html", "/swagger-resources/**", "/v2/api-docs", "/webjars/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(new JwtTokenGeneratorFilter(authenticationManager()))
@@ -42,7 +41,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public BCryptPasswordEncoder passwordEncoderInConfig(){
+    public BCryptPasswordEncoder passwordEncoderInConfig() {
         return new BCryptPasswordEncoder();
     }
 
@@ -51,5 +50,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         auth.userDetailsService(userService)
                 .passwordEncoder(passwordEncoderInConfig());
     }
+
+
+
 
 }
